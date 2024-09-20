@@ -1,0 +1,47 @@
+{
+  "name": "sportz",
+  "version": "1.0.0",
+  "description": "new one",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "keywords": [
+    "armh"
+  ],
+  "author": "pr",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/polyfill": "^7.12.1",
+    "axios": "^1.6.2",
+    "bcryptjs": "^2.4.3",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^7.0.0",
+    "express": "^4.16.4",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^7.1.2",
+    "fastify-cookie": "^5.7.0",
+    "helmet": "^7.0.0",
+    "hpp": "^0.2.3",
+    "html-to-text": "^9.0.5",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.0.4",
+    "morgan": "^1.9.1",
+    "multer": "^1.4.1",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.9.7",
+    "nodemon": "^2.0.22",
+    "pug": "^3.0.2",
+    "sharp": "^0.33.2",
+    "slugify": "^1.3.4",
+    "stripe": "^7.0.0",
+    "validator": "^13.11.0",
+    "xss-clean": "^0.1.4"
+  },
+  "engines": {
+    "node": ">=10.0.0"
+  }
+}
