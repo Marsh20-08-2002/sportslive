@@ -4,6 +4,31 @@ const Academy = require("../models/academyModel");
 const Email = require("../utils/email");
 const AppError = require("../utils/appError");
 
+exports.createAcademy = catchAsync(async (req, res, next) => {
+  // Ensure the logged-in user is present
+  if (!req.user) {
+    return next(
+      new AppError("You must be logged in to create an academy", 401)
+    );
+  }
+
+  // Assign the logged-in user as the academy owner
+  const academyData = {
+    ...req.body, // Data from the request body (name, price, etc.)
+    owner: req.user.id, // Set the owner to the logged-in user's ID
+  };
+
+  // Create the academy
+  const newAcademy = await Academy.create(academyData);
+
+  // Send the response
+  res.status(201).json({
+    status: "success",
+    data: {
+      academy: newAcademy,
+    },
+  });
+});
 exports.getAllacadmey = catchAsync(async (req, res, next) => {
   const academies = await Academy.find().sort({ createdAt: -1 });
   if (!academies) {

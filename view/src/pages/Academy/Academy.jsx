@@ -3,14 +3,14 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 //import clubs from "../../Data/Clubs";
 function Academy() {
-  const [clubs, setClubs] = useState([]);
+  const [academies, setAcademies] = useState([]);
 
   useEffect(() => {
     const FetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/clubs");
-        console.log("reponse Clubs ", response.data.data);
-        setClubs(response.data.data);
+        const response = await axios.get(`/api/v1/acad/academies`);
+        console.log("reponse Academies ", response.data.data.academies);
+        setAcademies(response.data.data.academies);
       } catch (error) {
         console.error(error);
       }
@@ -64,34 +64,34 @@ function Academy() {
           </Slider> */}
         </div>
         {/* <h1 className="text-3xl font-bold mb-8"></h1> */}
-        {clubs.map((club, index) => (
+        {academies.map((academy, index) => (
           <div
             key={index}
             className="  max-w-md mx-4 mb-8 rounded-lg overflow-hidden shadow-lg p-6"
           >
-            <Link to={`/academy/${club.id}`}>
+            <Link to={`/academy/${academy.id}`}>
               <img
                 className="w-1/3 rounded mx-auto my-4"
-                src={club.logo}
-                alt={club.clubName}
+                src={academy.imageCover}
+                alt={academy.name}
               />
               <div className="px-6 py-4">
-                <div className="font-bold text-xl mb-2">{club.clubName}</div>
+                <div className="font-bold text-xl mb-2">{academy.name}</div>
                 <p className="text-gray-700 text-base">
-                  Location: {club.location}
+                  Location: {academy.location}
                 </p>
                 <p className="text-gray-700 text-base">Sports:</p>
                 <ul className="text-gray-700 text-base">
-                  {club.sports.map((sport, index) => (
+                  {academy.sports.map((sport, index) => (
                     <li key={index}>{sport}</li>
                   ))}
                 </ul>
                 <p className="text-gray-700 text-base">
-                  Established Year: {club.establishedYear}
+                  Established Year: {academy.establishedYear}
                 </p>
                 {/* <a
                 className="text-blue-500 hover:underline"
-                href={club.locationURL}
+                href={academy.locationURL}
               >
                 Location URL
               </a> */}
@@ -99,7 +99,7 @@ function Academy() {
             </Link>
             <a
               className="text-blue-500 hover:underline"
-              href={club.locationURL}
+              href={academy.locationURL}
             >
               Location URL
             </a>

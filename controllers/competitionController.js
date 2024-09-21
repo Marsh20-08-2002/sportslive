@@ -18,7 +18,7 @@ exports.getAllcompetition = catchAsync(async (req, res, next) => {
 });
 
 exports.createCompetition = catchAsync(async (req, res, next) => {
-  req.body.organizer = req.user._id;
+  req.body.organizer = req.user.id;
 
   const doc = await Organizer.create(req.body);
 
@@ -31,7 +31,7 @@ exports.createCompetition = catchAsync(async (req, res, next) => {
 });
 
 exports.mycompetition = catchAsync(async (req, res, next) => {
-  const Competition = await Organizer.find({ organizer: req.user._id });
+  const Competition = await Organizer.find({ organizer: req.user.id });
 
   if (!Competition.length) {
     return next(new AppError("No competition found for this!", 404));
@@ -46,10 +46,28 @@ exports.mycompetition = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.singlecompetition = catchAsync(async (req, res, next) => {
+  const doc = await Organizer.findById(req.params.id).populate(
+    "organizer",
+    "name"
+  );
+
+  if (!doc) {
+    return next(new AppError("No doc found with that id", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      data: doc,
+    },
+  });
+});
+
 exports.updatecompetition = catchAsync(async (req, res, next) => {
   // Find the turf by its ID and ensure it belongs to the logged-in user (turfowner)
   const organizer = await Organizer.findOneAndUpdate(
-    { _id: req.params.id, organizer: req.user._id },
+    { _id: req.params.id, organizer: req.user.id },
     req.body,
     {
       new: true, // Return the updated document
@@ -77,7 +95,7 @@ exports.updatecompetition = catchAsync(async (req, res, next) => {
 exports.deleteCompetition = catchAsync(async (req, res, next) => {
   const competition = await Organizer.findOneAndDelete({
     _id: req.params.id,
-    organizer: req.user._id,
+    organizer: req.user.id,
   });
 
   if (!competition) {

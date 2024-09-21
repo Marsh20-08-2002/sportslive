@@ -15,6 +15,8 @@ router
     compController.createCompetition
   );
 
+router.route("/:id").get(compController.singlecompetition);
+
 router.get(
   "/mycompetition",
   authController.protect,

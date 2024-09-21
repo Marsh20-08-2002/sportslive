@@ -1,3 +1,5 @@
+const mongoose = require("mongoose");
+const slugify = require("slugify");
 const academySchema = new mongoose.Schema(
   {
     name: {
