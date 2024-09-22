@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const slugify = require("slugify");
 const bookingSchema = new mongoose.Schema({
   competition: {
     type: mongoose.Schema.ObjectId,
@@ -24,11 +24,13 @@ const bookingSchema = new mongoose.Schema({
     default: true,
   },
 });
-
 bookingSchema.pre(/^find/, function (next) {
-  this.populate("user").populate({
-    path: "competition",
-    select: "name",
+  this.populate({
+    path: "user", // Path to the `user` field
+    select: "name email", // Fields to select from the `user`
+  }).populate({
+    path: "competition", // Path to the `competition` field
+    select: "name", // Fields to select from the `competition`
   });
   next();
 });

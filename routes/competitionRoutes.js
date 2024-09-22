@@ -12,8 +12,12 @@ router
   .post(
     authController.protect,
     authController.restrictTo("organizer"),
+    compController.uploadimage,
+    compController.resizeProductImage,
     compController.createCompetition
   );
+
+router.route("/:id").get(compController.singlecompetition);
 
 router.get(
   "/mycompetition",

@@ -20,7 +20,7 @@ exports.getAlltours = catchAsync(async (req, res, next) => {
 });
 
 exports.createTurf = catchAsync(async (req, res, next) => {
-  req.body.turfowner = req.user._id;
+  req.body.turfowner = req.user.id;
 
   const doc = await Turf.create(req.body);
 
@@ -33,7 +33,7 @@ exports.createTurf = catchAsync(async (req, res, next) => {
 });
 
 exports.myturf = catchAsync(async (req, res, next) => {
-  const turfs = await Turf.find({ turfowner: req.user._id });
+  const turfs = await Turf.find({ turfowner: req.user.id });
 
   if (!turfs.length) {
     return next(new AppError("No turfs found for this owner!", 404));
@@ -51,7 +51,7 @@ exports.myturf = catchAsync(async (req, res, next) => {
 exports.updateTurf = catchAsync(async (req, res, next) => {
   // Find the turf by its ID and ensure it belongs to the logged-in user (turfowner)
   const turf = await Turf.findOneAndUpdate(
-    { _id: req.params.id, turfowner: req.user._id },
+    { _id: req.params.id, turfowner: req.user.id },
     req.body,
     {
       new: true, // Return the updated document
@@ -79,7 +79,7 @@ exports.updateTurf = catchAsync(async (req, res, next) => {
 exports.deleteTurf = catchAsync(async (req, res, next) => {
   const turf = await Turf.findOneAndDelete({
     _id: req.params.id,
-    turfowner: req.user._id,
+    turfowner: req.user.id,
   });
 
   if (!turf) {
