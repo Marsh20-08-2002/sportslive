@@ -1,53 +1,88 @@
 // Login.js
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+
+import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
+
+import SnackBar from "../../components/Animation/SnackBar";
+import ApiLoading from "../../components/Animation/ApiLoading";
 
 const Login = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({
     email: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [loginError, setLoginError] = useState(false);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-    setErrors({
-      ...errors,
-      [name]: "",
-    });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      try {
+        setLoading(true);
+        const config = {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        };
+
+        const { data } = await axios.post(
+          "api/v1/users/login",
+          { email, password },
+          config
+        );
+
+        if (data.status === "success") {
+          setShowSuccessAlert(true);
+          setTimeout(() => setShowSuccessAlert(false), 2000); // Hide success alert after 3 seconds
+
+          setTimeout(() => {
+            navigate("/"); // Redirect to homepage
+            window.location.reload(); // Reload the page
+          }, 2000); // Show success alert for 2 seconds
+        }
+      } catch (error) {
+        setLoginError(true);
+        setTimeout(() => setLoginError(false), 2000); // Hide error alert after 3 seconds
+        console.error("Error logging in:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Basic validation
+  const validateForm = () => {
     let isValid = true;
-    const newErrors = { ...errors };
+    const newErrors = {
+      email: "",
+      password: "",
+    };
 
-    if (!formData.email) {
+    // Validate email
+    if (!email) {
       newErrors.email = "Email is required";
       isValid = false;
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Password is required";
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = "Email is invalid";
       isValid = false;
     }
 
-    if (!isValid) {
-      setErrors(newErrors);
-      return;
+    // Validate password
+    if (!password) {
+      newErrors.password = "Password is required";
+      isValid = false;
+    } else if (password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters long";
+      isValid = false;
     }
 
-    // Proceed with login logic calling the lofin api
-    console.log("Logging in...");
+    setErrors(newErrors);
+    return isValid;
   };
 
   return (
@@ -70,8 +105,8 @@ const Login = () => {
                   errors.email ? "border-red-300" : "border-gray-300"
                 } placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10 sm:text-sm sm:leading-5`}
                 placeholder="Email address"
-                value={formData.email}
-                onChange={handleChange}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
               {errors.email && (
                 <p className="mt-1 text-xs text-red-500">{errors.email}</p>
@@ -87,8 +122,8 @@ const Login = () => {
                   errors.password ? "border-red-300" : "border-gray-300"
                 } placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10 sm:text-sm sm:leading-5`}
                 placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
               {errors.password && (
                 <p className="mt-1 text-xs text-red-500">{errors.password}</p>
@@ -112,35 +147,57 @@ const Login = () => {
             </div> */}
 
             <div className="text-sm leading-5">
-              <a
-                href="#"
+              <Link
+                to="/forgetPassword"
                 className="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:underline transition ease-in-out duration-150"
               >
                 Forgot your password?
-              </a>
+              </Link>
             </div>
           </div>
 
           <div className="mt-6">
-            <button
-              type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition duration-150 ease-in-out"
-            >
-              <span className="absolute left-0 inset-y-0 flex items-center pl-3">
-                <svg
-                  className="h-5 w-5 text-indigo-500 group-hover:text-indigo-400 transition ease-in-out duration-150"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M5.293 7.293a1 1 0 0 1 1.414-1.414L10 10.586l3.293-3.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4z"
-                  />
-                </svg>
-              </span>
-              Sign in
-            </button>
+            {loading ? (
+              <div className="text-center my-4">
+                <div className="loader inline-block">
+                  <ApiLoading />
+                </div>
+              </div>
+            ) : (
+              <button
+                type="submit"
+                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition duration-150 ease-in-out"
+              >
+                <span className="absolute left-0 inset-y-0 flex items-center pl-3">
+                  <svg
+                    className="h-5 w-5 text-indigo-500 group-hover:text-indigo-400 transition ease-in-out duration-150"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5.293 7.293a1 1 0 0 1 1.414-1.414L10 10.586l3.293-3.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4z"
+                    />
+                  </svg>
+                </span>
+                Sign in
+              </button>
+            )}
           </div>
+          {loginError && (
+            <SnackBar
+              isOpen={true}
+              message="Login failed. Please try again."
+              type="error"
+            />
+          )}
+          {showSuccessAlert && (
+            <SnackBar
+              isOpen={true}
+              message="Login successfull!"
+              type="success"
+            />
+          )}
         </form>
 
         <p className="mt-2 text-center text-sm leading-5 text-gray-600">

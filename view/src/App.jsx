@@ -14,6 +14,7 @@ import RecommendedCompetitions from "./pages/Competiton/RecommendedCompetitions"
 import Footer from "./components/Footer/Footer";
 import Admin from "./pages/Admin/Admin";
 import RegistrationForm from "./pages/Home/RegisterOnOurWebsite";
+import OrganizerComp from "./pages/Competiton/OrganizerCompetitionForm";
 //import CreateClubForm from "./pages/Academy/CreateClubForm";
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/organizer-competition" element={<OrganizerComp />} />
         {/* <Route path="/signup" element={<Signup />} /> */}
         <Route path="turf" element={<TurfList />} />
         <Route path="turf/:id" element={<TurfList />} />
