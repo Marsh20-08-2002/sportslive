@@ -23,7 +23,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
       req.params.compId
     }&user=${req.user.id}&price=${comp.price}`,
     //upper one lecture 214
-    cancel_url: `${req.protocol}://${req.get("host")}/comp/${comp._id}`,
+    cancel_url: `${req.protocol}://${req.get("host")}/comp/${comp.id}`,
     customer_email: req.user.email,
     client_reference_id: req.params.compId,
     line_items: [
@@ -92,4 +92,119 @@ exports.getMyCompetitions = catchAsync(async (req, res, next) => {
       competitions,
     },
   });
+});
+
+exports.createreport = catchAsync(async (req, ers, next) => {
+  const workbook = new Exceljs.Workbook();
+  const worksheet = workbook.addWorksheet("competitionlist");
+
+  worksheet.columns = [
+    { heade: "S.no", key: "s_no", width: 5 },
+    { header: "competition ID", key: "competitionId", width: 29 },
+    { header: "competition Name", key: "competitionName", width: 29 },
+    { header: "User Name", key: "userName", width: 29 },
+    { header: "User Email", key: "userEmail", width: 29 },
+    { header: "Price", key: "price", width: 29 },
+    { header: "Paid", key: "paid", width: 5 },
+    { header: "Date and Time", key: "datetime", width: 29 },
+  ];
+  const { year } = req.query; // Extract selected year from query parameters
+
+  let query = {};
+
+  // Filter bookings based on the selected year
+  if (year) {
+    const startDate = new Date(`${year}-01-01T00:00:00.000Z`);
+    const endDate = new Date(`${year}-12-31T23:59:59.999Z`);
+    query.createdAt = { $gte: startDate, $lte: endDate };
+  }
+  const book = await Booking.find(query);
+  const bookings = book.filter((booking) => booking.competition != null);
+  let rowNum = 2;
+
+  bookings.forEach((booking, index) => {
+    worksheet.addRow({
+      s_no: index + 1,
+      competitioId: booking.competition.id,
+      competitionName: booking.competition.name,
+      userName: booking.user.name,
+      userEmail: booking.user.email,
+      price: booking.price,
+      paid: booking.paid ? "yes" : "No",
+      dateTime: booking.createdAt,
+    });
+  });
+
+  res.setHeader(
+    "Content-Type",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  );
+  res.setHeader(
+    "Content-Disposition",
+    "attachment; filename=bookingsdata.xlsx"
+  );
+  await workbook.xlsx.write(res);
+});
+
+exports.createOrganizerReport = catchAsync(async (req, res, next) => {
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet("Competition List");
+
+  worksheet.columns = [
+    { header: "S.no", key: "s_no", width: 5 },
+    { header: "Competition ID", key: "competitionId", width: 29 },
+    { header: "Competition Name", key: "competitionName", width: 29 },
+    { header: "User Name", key: "userName", width: 29 },
+    { header: "User Email", key: "userEmail", width: 29 },
+    { header: "Price", key: "price", width: 29 },
+    { header: "Paid", key: "paid", width: 5 },
+    { header: "Date and Time", key: "datetime", width: 29 },
+  ];
+
+  // 1) Get the current year from query or default to all
+  const { year } = req.query;
+
+  let query = { organizer: req.user.id }; // Filter competitions by the logged-in organizer
+
+  if (year) {
+    const startDate = new Date(`${year}-01-01T00:00:00.000Z`);
+    const endDate = new Date(`${year}-12-31T23:59:59.999Z`);
+    query.createdAt = { $gte: startDate, $lte: endDate };
+  }
+
+  // 2) Find all competitions organized by the user
+  const competitions = await Comp.find({ organizer: req.user.id });
+
+  // 3) Get only bookings related to those competitions
+  const bookings = await Booking.find({
+    competition: { $in: competitions.map((comp) => comp._id) },
+  })
+    .populate("competition")
+    .populate("user");
+
+  let rowNum = 2;
+
+  bookings.forEach((booking, index) => {
+    worksheet.addRow({
+      s_no: index + 1,
+      competitionId: booking.competition.id,
+      competitionName: booking.competition.name,
+      userName: booking.user.name,
+      userEmail: booking.user.email,
+      price: booking.price,
+      paid: booking.paid ? "Yes" : "No",
+      datetime: booking.createdAt,
+    });
+  });
+
+  // 4) Set headers and generate the Excel file for download
+  res.setHeader(
+    "Content-Type",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  );
+  res.setHeader(
+    "Content-Disposition",
+    `attachment; filename=${req.user.name}_bookings.xlsx`
+  );
+  await workbook.xlsx.write(res);
 });

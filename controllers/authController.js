@@ -54,9 +54,9 @@ exports.signup = catchAsync(async (req, res, next) => {
 
   //the url from the email.js is coming from here
   //willdo this 18/9/2024-------------------------------
-  //   const url = `${req.protocol}://${req.get("host")}/me`;
-  //   // console.log(url);
-  //   await new Email(newUser, url).sendWelcome();
+  const url = `${req.protocol}://${req.get("host")}/me`;
+  // console.log(url);
+  await new Email(newUser, url).sendWelcome();
 
   //video 129
 

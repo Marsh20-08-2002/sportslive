@@ -24,7 +24,7 @@ const orgschema = new mongoose.Schema(
     description: {
       type: String,
       trim: true,
-      required: [true, "A turf must have a description"],
+      // required: [true, "A turf must have a description"],
     },
     imageCover: {
       type: String,
@@ -36,7 +36,6 @@ const orgschema = new mongoose.Schema(
       description: String,
     },
     googlelocation: String,
-    images: [String],
     createdAt: {
       type: Date,
       default: Date.now(),
@@ -49,11 +48,11 @@ const orgschema = new mongoose.Schema(
 
     date: {
       type: Date,
-      required: [true, "A tournament must have a date"],
+      // required: [true, "A tournament must have a date"],
     },
     time: {
       type: String,
-      required: [true, "A tournament must have a time"],
+      // required: [true, "A tournament must have a time"],
     },
     turf: {
       type: mongoose.Schema.ObjectId,

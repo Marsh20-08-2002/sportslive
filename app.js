@@ -16,6 +16,8 @@ const turfRouter = require("./routes/turfRoutes");
 
 const compRouter = require("./routes/competitionRoutes");
 const bookingRouter = require("./routes/compRegisterRoutes");
+
+const acadRouter = require("./routes/academyRoutes");
 const app = express();
 
 app.use(helmet({ contentSecurityPolicy: false }));
@@ -53,7 +55,7 @@ app.use((req, res, next) => {
 });
 
 // app.use('/', viewRouter);
-// app.use('/api/v1/tours', tourRouter);
+app.use("/api/v1/acad", acadRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/turf", turfRouter);
 app.use("/api/v1/comp", compRouter);

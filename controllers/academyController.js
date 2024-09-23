@@ -18,8 +18,48 @@ exports.getAllacadmey = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.singleAcademy = catchAsync(async (req, res, next) => {
+  const academy = await Academy.findById(req.params.id);
+  if (!academy) {
+    return next(new AppError("No academy found with that id", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      data: academy,
+    },
+  });
+});
+
+exports.createAcademy = catchAsync(async (req, res, next) => {
+  // Ensure the logged-in user is present
+  if (!req.user) {
+    return next(
+      new AppError("You must be logged in to create an academy", 401)
+    );
+  }
+
+  // Assign the logged-in user as the academy owner
+  const academyData = {
+    ...req.body, // Data from the request body (name, price, etc.)
+    owner: req.user.id, // Set the owner to the logged-in user's ID
+  };
+
+  // Create the academy
+  const newAcademy = await Academy.create(academyData);
+
+  // Send the response
+  res.status(201).json({
+    status: "success",
+    data: {
+      academy: newAcademy,
+    },
+  });
+});
+
 exports.getMyacademy = catchAsync(async (req, res, next) => {
-  const academy = await Academy.findOne({ owner: req.user._id });
+  const academy = await Academy.findOne({ owner: req.user.id });
 
   if (!academy) {
     return res.status(404).json({
@@ -38,7 +78,7 @@ exports.getMyacademy = catchAsync(async (req, res, next) => {
 
 exports.updateMyacademy = catchAsync(async (req, res, next) => {
   const updatedAcademy = await Academy.findOneAndUpdate(
-    { owner: req.user._id },
+    { owner: req.user.id },
     req.body,
     { new: true, runValidators: true }
   );
@@ -59,7 +99,7 @@ exports.updateMyacademy = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteMyacademy = catchAsync(async (req, res, next) => {
-  const academy = await Academy.findOneAndDelete({ owner: req.user._id });
+  const academy = await Academy.findOneAndDelete({ owner: req.user.id });
 
   if (!academy) {
     return res.status(404).json({

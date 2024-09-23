@@ -11,6 +11,8 @@ router.route("/academies").get(academyController.getAllacadmey).post(
   authController.restrictTo("admin", "owner"), // Only admin or academy owner can create academies
   academyController.createAcademy // Add this method if you want to create academies
 );
+
+router.route("/:id").get(academyController.singleAcademy);
 // Route for the academy owner to get/update/delete their academy
 router
   .route("/myacademy")
