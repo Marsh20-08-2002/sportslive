@@ -43,6 +43,12 @@ function Navbar() {
             >
               Home
             </NavLink>
+            <NavLink
+              to="/organizer-competition"
+              className="py-2 px-3 hover:bg-[#228B22] text-gray-700 hover:text-gray-950 rounded"
+            >
+              Organizer Competition
+            </NavLink>
             {/* <NavLink
               to="/booking"
               className="py-2 px-3 hover:bg-[#228B22] text-gray-700 hover:text-gray-950 rounded"
